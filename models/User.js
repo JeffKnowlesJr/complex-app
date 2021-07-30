@@ -66,18 +66,23 @@ User.prototype.validate = function () {
   }
 }
 
-User.prototype.login = function (callBack) {
-  this.cleanUp()
-  usersCollection.findOne(
-    { username: this.data.username },
-    (err, attemptedUser) => {
-      if (attemptedUser && attemptedUser.password == this.data.password) {
-        callBack('User logged in')
-      } else {
-        callBack('User failed to login')
-      }
-    }
-  )
+User.prototype.login = function () {
+  // Call Back Approach -> Ommitted for Promise implementation
+  return new Promise((resolve, reject) => {
+    this.cleanUp()
+    usersCollection
+      .findOne({ username: this.data.username })
+      .then((user) => {
+        if (user && user.password == this.data.password) {
+          resolve('User logged in')
+        } else {
+          reject('User failed to login')
+        }
+      })
+      .catch(() => {
+        reject('Please try again later')
+      })
+  })
 }
 
 User.prototype.register = function () {
