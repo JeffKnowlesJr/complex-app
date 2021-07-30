@@ -15,7 +15,7 @@ mongodb.connect(
     if (err) {
       return console.error(err)
     }
-    module.exports = client.db()
+    module.exports = client
     const app = require('./server')
     app.listen(PORT, () => {
       console.log(`Listening on port: ${PORT}`)

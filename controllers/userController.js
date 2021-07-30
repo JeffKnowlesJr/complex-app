@@ -5,9 +5,9 @@ exports.login = (req, res) => {
   // login returns a promise
   user
     .login()
-    .then((result) => {
+    .then(() => {
       req.session.user = { favColor: 'blue', username: user.data.username }
-      res.send(result)
+      res.redirect('/')
     })
     .catch((err) => {
       res.send(err)
@@ -31,7 +31,7 @@ exports.register = (req, res) => {
 exports.home = (req, res) => {
   if (req.session.user) {
     console.log(req.session.user)
-    res.send(`Welcome to the App ${req.session.user.username}`)
+    res.render('home-dashboard', { username: req.session.user.username })
   } else {
     res.render('home-guest')
   }
