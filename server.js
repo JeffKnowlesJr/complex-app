@@ -2,8 +2,6 @@ const express = require('express')
 
 const router = require('./router')
 
-const PORT = process.env.PORT || 3000
-
 app = express()
 
 // These two lines tell express to accept user data
@@ -18,4 +16,4 @@ app.set('view engine', 'ejs')
 
 app.use('/', router)
 
-app.listen(PORT)
+module.exports = app

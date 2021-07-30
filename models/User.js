@@ -1,3 +1,4 @@
+const usersCollection = require('../db').collection('users')
 const validator = require('validator')
 
 // Constructor Function: This function required a special consideration
@@ -65,6 +66,20 @@ User.prototype.validate = function () {
   }
 }
 
+User.prototype.login = function (callBack) {
+  this.cleanUp()
+  usersCollection.findOne(
+    { username: this.data.username },
+    (err, attemptedUser) => {
+      if (attemptedUser && attemptedUser.password == this.data.password) {
+        callBack('User logged in')
+      } else {
+        callBack('User failed to login')
+      }
+    }
+  )
+}
+
 User.prototype.register = function () {
   // Step #1: Validate user data
   this.cleanUp()
@@ -72,6 +87,9 @@ User.prototype.register = function () {
 
   // Step #2: Only if there are no validation errors
   // then save the user data into a database
+  if (!this.errors.length) {
+    usersCollection.insertOne(this.data)
+  }
 }
 
 module.exports = User
