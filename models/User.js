@@ -77,7 +77,7 @@ User.prototype.login = function () {
         if (user && bcrypt.compareSync(this.data.password, user.password)) {
           resolve('User logged in')
         } else {
-          reject('User failed to login')
+          reject('Invalid username or password')
         }
       })
       .catch(() => {

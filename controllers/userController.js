@@ -13,7 +13,11 @@ exports.login = (req, res) => {
       })
     })
     .catch((err) => {
-      res.send(err)
+      req.flash('errors', err)
+      // req.session.flash.errors = [err]
+      req.session.save(() => {
+        res.redirect('/')
+      })
     })
 }
 
@@ -40,6 +44,7 @@ exports.home = (req, res) => {
     console.log(req.session.user)
     res.render('home-dashboard', { username: req.session.user.username })
   } else {
-    res.render('home-guest')
+    // using flash package to access and delete errors
+    res.render('home-guest', { errors: req.flash('errors') })
   }
 }
