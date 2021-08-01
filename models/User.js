@@ -32,39 +32,60 @@ User.prototype.cleanUp = function () {
 }
 
 User.prototype.validate = function () {
-  let { username, email, password } = this.data
-  let err = this.errors
+  return new Promise(async (resolve, reject) => {
+    let { username, email, password } = this.data
+    let err = this.errors
 
-  // if username, email, password field is blank
-  if (username == '') {
-    err.push('Username is required')
-  }
-  if (!validator.isEmail(email)) {
-    err.push('Valid email is required')
-  }
-  if (password == '') {
-    err.push('Valid password is required')
-  }
-  // if password is less than 8 characters
-  if (password.length < 8 && password.length > 0) {
-    err.push('Password must be at least 8 characters')
-  }
-  // if password is more than 50 characters
-  if (password.length > 50) {
-    err.push('Password must be at most 50 characters')
-  }
-  // if username is less than 6 characters
-  if (username.length < 4 && username.length > 0) {
-    err.push('Username must be at least 4 characters')
-  }
-  // if username is more than 16 characters
-  if (username.length > 16) {
-    err.push('Username must be at most 16 characters')
-  }
-  // if username is not alphanumeric
-  if (username != '' && !validator.isAlphanumeric(username)) {
-    err.push('Username can only contain letters and numbers')
-  }
+    // if username, email, password field is blank
+    if (username == '') {
+      err.push('Username is required')
+    }
+    if (!validator.isEmail(email)) {
+      err.push('Valid email is required')
+    }
+    if (password == '') {
+      err.push('Valid password is required')
+    }
+    // if password is less than 8 characters
+    if (password.length < 8 && password.length > 0) {
+      err.push('Password must be at least 8 characters')
+    }
+    // if password is more than 50 characters
+    if (password.length > 50) {
+      err.push('Password must be at most 50 characters')
+    }
+    // if username is less than 6 characters
+    if (username.length < 4 && username.length > 0) {
+      err.push('Username must be at least 4 characters')
+    }
+    // if username is more than 16 characters
+    if (username.length > 16) {
+      err.push('Username must be at most 16 characters')
+    }
+    // if username is not alphanumeric
+    if (username != '' && !validator.isAlphanumeric(username)) {
+      err.push('Username can only contain letters and numbers')
+    }
+    // if username is valid check if taken
+    if (
+      username.length > 4 &&
+      username.length < 16 &&
+      validator.isAlphanumeric(username)
+    ) {
+      let usernameExists = await usersCollection.findOne({ username: username })
+      if (usernameExists) {
+        err.push('This username already exists')
+      }
+    }
+    // if email is valid check if taken
+    if (validator.isEmail(email)) {
+      let emailExists = await usersCollection.findOne({ email: email })
+      if (emailExists) {
+        err.push('This email is already being used')
+      }
+    }
+    resolve()
+  })
 }
 
 User.prototype.login = function () {
@@ -87,18 +108,23 @@ User.prototype.login = function () {
 }
 
 User.prototype.register = function () {
-  // Step #1: Validate user data
-  this.cleanUp()
-  this.validate()
+  return new Promise(async (resolve, reject) => {
+    // Step #1: Validate user data
+    this.cleanUp()
+    await this.validate()
 
-  // Step #2: Only if there are no validation errors
-  // then save the user data into a database
-  if (!this.errors.length) {
-    // hash user password
-    let salt = bcrypt.genSaltSync(10)
-    this.data.password = bcrypt.hashSync(this.data.password, salt)
-    usersCollection.insertOne(this.data)
-  }
+    // Step #2: Only if there are no validation errors
+    // then save the user data into a database
+    if (!this.errors.length) {
+      // hash user password
+      let salt = bcrypt.genSaltSync(10)
+      this.data.password = bcrypt.hashSync(this.data.password, salt)
+      await usersCollection.insertOne(this.data)
+      resolve()
+    } else {
+      reject(this.errors)
+    }
+  })
 }
 
 module.exports = User
