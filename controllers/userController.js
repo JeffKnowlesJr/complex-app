@@ -7,7 +7,7 @@ exports.login = (req, res) => {
     .login()
     .then(() => {
       // Req reuires async redirect
-      req.session.user = { favColor: 'blue', username: user.data.username }
+      req.session.user = { avatar: user.avatar, username: user.data.username }
       req.session.save(() => {
         res.redirect('/')
       })
@@ -32,7 +32,7 @@ exports.register = (req, res) => {
   user
     .register()
     .then(() => {
-      req.session.user = { username: user.data.username }
+      req.session.user = { avatar: user.avatar, username: user.data.username }
       req.session.save(() => {
         res.redirect('/')
       })
@@ -49,8 +49,11 @@ exports.register = (req, res) => {
 
 exports.home = (req, res) => {
   if (req.session.user) {
-    console.log(req.session.user)
-    res.render('home-dashboard', { username: req.session.user.username })
+    // console.log(req.session.user)
+    res.render('home-dashboard', {
+      avatar: req.session.user.avatar,
+      username: req.session.user.username
+    })
   } else {
     // using flash package to access and delete errors
     res.render('home-guest', {

@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs')
 const usersCollection = require('../db').db().collection('users')
 const validator = require('validator')
+const md5 = require('md5')
 
 // Constructor Function: This function required a special consideration
 // to allow the use of the this keyword to point to the new instance of
@@ -96,6 +97,8 @@ User.prototype.login = function () {
       .findOne({ username: this.data.username })
       .then((user) => {
         if (user && bcrypt.compareSync(this.data.password, user.password)) {
+          this.data = user
+          this.getAvatar()
           resolve('User logged in')
         } else {
           reject('Invalid username or password')
@@ -120,11 +123,16 @@ User.prototype.register = function () {
       let salt = bcrypt.genSaltSync(10)
       this.data.password = bcrypt.hashSync(this.data.password, salt)
       await usersCollection.insertOne(this.data)
+      this.getAvatar()
       resolve()
     } else {
       reject(this.errors)
     }
   })
+}
+
+User.prototype.getAvatar = function () {
+  this.avatar = `https://s.gravatar.com/avatar/${md5(this.data.email)}?s=128`
 }
 
 module.exports = User
