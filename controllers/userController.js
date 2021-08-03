@@ -61,10 +61,7 @@ exports.register = (req, res) => {
 exports.home = (req, res) => {
   if (req.session.user) {
     // console.log(req.session.user)
-    res.render('home-dashboard', {
-      avatar: req.session.user.avatar,
-      username: req.session.user.username
-    })
+    res.render('home-dashboard')
   } else {
     // using flash package to access and delete errors
     res.render('home-guest', {

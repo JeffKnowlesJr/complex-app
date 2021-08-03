@@ -2,7 +2,6 @@ const express = require('express')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')(session)
 const flash = require('connect-flash')
-const router = require('./router')
 
 app = express()
 
@@ -19,6 +18,13 @@ let sessionOptions = session({
 
 app.use(sessionOptions)
 app.use(flash())
+
+app.use((req, res, next) => {
+  res.locals.user = req.session.user
+  next()
+})
+
+const router = require('./router')
 
 // These two lines tell express to accept user data
 // from our form or included in the header as json
