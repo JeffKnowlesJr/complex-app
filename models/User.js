@@ -6,9 +6,15 @@ const md5 = require('md5')
 // Constructor Function: This function required a special consideration
 // to allow the use of the this keyword to point to the new instance of
 // the user being created. An arrow function will not work as expected.
-let User = function (formData) {
+let User = function (formData, getAvatar) {
   this.data = formData
   this.errors = []
+  if (getAvatar == undefined) {
+    getAvatar = false
+  }
+  if (getAvatar) {
+    this.getAvatar()
+  }
 }
 
 User.prototype.cleanUp = function () {
@@ -133,6 +139,33 @@ User.prototype.register = function () {
 
 User.prototype.getAvatar = function () {
   this.avatar = `https://s.gravatar.com/avatar/${md5(this.data.email)}?s=128`
+}
+
+User.findByUserName = (username) => {
+  return new Promise((resolve, reject) => {
+    if (typeof username != 'string') {
+      reject()
+      return
+    }
+    usersCollection
+      .findOne({ username: username })
+      .then((userDocument) => {
+        if (userDocument) {
+          userDocument = new User(userDocument, true)
+          userDocument = {
+            _id: userDocument.data._id,
+            username: userDocument.data.username,
+            avatar: userDocument.avatar
+          }
+          resolve(userDocument)
+        } else {
+          reject()
+        }
+      })
+      .catch(() => {
+        reject()
+      })
+  })
 }
 
 module.exports = User

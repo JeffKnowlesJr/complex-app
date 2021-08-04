@@ -78,3 +78,21 @@ exports.home = (req, res) => {
     })
   }
 }
+
+exports.ifUserExists = (req, res, next) => {
+  User.findByUserName(req.params.username)
+    .then((userDocument) => {
+      req.profileUser = userDocument
+      next()
+    })
+    .catch(() => {
+      res.render('404')
+    })
+}
+
+exports.profilePostsScreen = (req, res) => {
+  res.render('profile', {
+    profileUsername: req.profileUser.username,
+    profileAvatar: req.profileUser.avatar
+  })
+}
