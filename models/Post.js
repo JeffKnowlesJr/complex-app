@@ -4,8 +4,11 @@ const User = require('../models/User')
 
 // Post Constructor Function
 // Accepts a Post Object and the Author's User ID
-let Post = function (formData, userid) {
-  ;(this.data = formData), (this.errors = []), (this.userid = userid)
+let Post = function (formData, userid, requestedPostId) {
+  ;(this.data = formData),
+    (this.errors = []),
+    (this.userid = userid),
+    (this.requestedPostId = requestedPostId)
 }
 
 Post.prototype.cleanUp = function () {
@@ -52,6 +55,41 @@ Post.prototype.create = function () {
         })
     } else {
       reject(this.errors)
+    }
+  })
+}
+
+Post.prototype.update = function () {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let post = await Post.findSingleById(this.requestedPostId, this.userid)
+      if (post.isVisitorOwner) {
+        // actually update the db
+        let status = await this.updatePost()
+        resolve(status)
+      } else {
+        reject()
+      }
+    } catch {
+      reject()
+    }
+  })
+}
+
+Post.prototype.updatePost = function () {
+  return new Promise(async (resolve, reject) => {
+    this.cleanUp()
+    this.validate()
+    if (!this.errors.length) {
+      await postsCollection.findOneAndUpdate(
+        {
+          _id: new ObjectID(this.requestedPostId)
+        },
+        { $set: { title: this.data.title, body: this.data.body } }
+      )
+      resolve('success')
+    } else {
+      resolve('failure')
     }
   })
 }

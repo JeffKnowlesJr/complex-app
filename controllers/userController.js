@@ -74,7 +74,6 @@ exports.home = (req, res) => {
   } else {
     // using flash package to access and delete errors
     res.render('home-guest', {
-      errors: req.flash('errors'),
       regErrors: req.flash('regErrors')
     })
   }
