@@ -20,6 +20,14 @@ app.use(sessionOptions)
 app.use(flash())
 
 app.use((req, res, next) => {
+  // make current user id available on the req object
+  if (req.session.user) {
+    req.visitorId = req.session.user.id
+  } else {
+    req.visitorId = 0
+  }
+
+  // make user session data available from within view templates
   res.locals.user = req.session.user
   next()
 })
