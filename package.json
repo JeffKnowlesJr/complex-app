@@ -5,8 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node db.js",
-    "dev": "nodemon db.js --ignore frontend-js --ignore public/",
-    "watch": "webpack --watch",
+    "watch-backend": "nodemon db.js --ignore frontend-js --ignore public/",
+    "watch-frontend": "webpack --watch",
+    "dev": "concurrently 'npm:watch-backend' 'npm:watch-frontend'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -19,6 +20,7 @@
     "axios": "^0.21.1",
     "babel-loader": "^8.2.2",
     "bcryptjs": "^2.4.3",
+    "concurrently": "^6.2.1",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^3.2.0",
     "cors": "^2.8.5",
