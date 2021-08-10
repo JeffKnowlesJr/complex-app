@@ -3,6 +3,20 @@ const ObjectID = require('mongodb').ObjectID
 const User = require('./User')
 const sanitizeHTML = require('sanitize-html')
 
+// Some MongoDB things!
+// If you'd rather create indexes on your database collections without going into the Atlas website you can use the code below:
+// postsCollection.createIndex({title: "text", body: "text"})
+// For example, you could include this code towards the top of your Post.js model file.  MongoDB will only create the index if one doesn't already exist; so leaving this in your code wouldn't be a huge problem; although just to be clean and safe you could comment it out once you know the index has been created.
+// This way if you ever move to a new database you can just uncomment the line and the index will be created automatically.
+// If you'd like to see a list of all the indexes you currently have on a collection you can use this code:
+// async function checkIndexes() {
+//   const indexes = await postsCollection.indexes()
+//   console.log(indexes)
+// }
+// checkIndexes()
+// You can delete an index by taking note of its name from the above list, and then you'd pass the name of the index as an argument like this:
+// postsCollection.dropIndex("namehere")
+
 // Post Constructor Function
 // Accepts a Post Object and the Author's User ID
 let Post = function (formData, userid, requestedPostId) {
@@ -99,27 +113,33 @@ Post.prototype.updatePost = function () {
 }
 
 // This is a mongoose strategy
-Post.reusablePostQuery = function (uniqueOperations, visitorId) {
+Post.reusablePostQuery = function (
+  uniqueOperations,
+  visitorId,
+  finalOperations = []
+) {
   return new Promise(async function (resolve, reject) {
-    let aggOpperations = uniqueOperations.concat([
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'author',
-          foreignField: '_id',
-          as: 'authorDocument'
+    let aggOpperations = uniqueOperations
+      .concat([
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'author',
+            foreignField: '_id',
+            as: 'authorDocument'
+          }
+        },
+        {
+          $project: {
+            title: 1,
+            body: 1,
+            createdAt: 1,
+            authorId: '$author',
+            author: { $arrayElemAt: ['$authorDocument', 0] }
+          }
         }
-      },
-      {
-        $project: {
-          title: 1,
-          body: 1,
-          createdAt: 1,
-          authorId: '$author',
-          author: { $arrayElemAt: ['$authorDocument', 0] }
-        }
-      }
-    ])
+      ])
+      .concat(finalOperations)
 
     // Adds author property to the lookup
     let posts = await postsCollection.aggregate(aggOpperations).toArray()
@@ -127,6 +147,7 @@ Post.reusablePostQuery = function (uniqueOperations, visitorId) {
     // clean up author property in each post object
     posts = posts.map((post) => {
       post.isVisitorOwner = post.authorId.equals(visitorId)
+      post.authorId = undefined
 
       post.author = {
         username: post.author.username,
@@ -178,6 +199,21 @@ Post.delete = function (id, visitorId) {
       }
     } catch (err) {
       reject(err)
+    }
+  })
+}
+
+Post.search = function (searchTerm) {
+  return new Promise(async (resolve, reject) => {
+    if (typeof searchTerm == 'string') {
+      let posts = await Post.reusablePostQuery(
+        [{ $match: { $text: { $search: searchTerm } } }],
+        undefined,
+        [{ $sort: { score: { $meta: 'textScore' } } }]
+      )
+      resolve(posts)
+    } else {
+      reject()
     }
   })
 }

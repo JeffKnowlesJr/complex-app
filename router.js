@@ -16,6 +16,7 @@ router.get('/post/:id', postController.viewSingle)
 router.get('/post/:id/edit', userController.auth, postController.viewEditScreen)
 router.post('/post/:id/edit', userController.auth, postController.edit)
 router.post('/post/:id/delete', userController.auth, postController.delete)
+router.post('/search', postController.search)
 
 // Profile related routes
 router.get(

@@ -32,18 +32,19 @@ export default class Search {
       this.showLoaderIcon()
       this.typingWaitTimer = setTimeout(() => {
         this.sendRequest()
-      }, 3000)
+      }, 1000)
     }
     this.previousValue = value
   }
 
   sendRequest() {
-    console.log('Sending request')
     axios
       .post('/search', { searchTerm: this.inputField.value })
-      .then(() => {})
+      .then((response) => {
+        console.log(response.data)
+      })
       .catch((err) => {
-        alert(`${err.message}`)
+        console.log(`${err.message}`)
       })
   }
 
