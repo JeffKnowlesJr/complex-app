@@ -1,5 +1,32 @@
 const User = require('../models/User')
 const Post = require('../models/Post')
+const Follow = require('../models/Follow')
+
+// This function is going to run on a profile route
+exports.sharedProfileData = async (req, res, next) => {
+  let isVisitorsProfile = false
+
+  // We're setting a default is following propery to false
+  let isFollowing = false
+
+  // If the current visitor is logged in
+  if (req.session.user) {
+    isVisitorsProfile = req.profileUser._id.equals(req.session.user.id)
+
+    // Is this visitor following the current profile?
+    isFollowing = await Follow.isVisitorFollowing(
+      req.profileUser._id,
+      req.visitorId
+    )
+  }
+
+  // We're storing the result on our request object so that
+  // we can use it within our next function on the route
+  req.isFollowing = isFollowing
+  req.isVisitorsProfile = isVisitorsProfile
+
+  next()
+}
 
 exports.auth = function (req, res, next) {
   if (req.session.user) {
@@ -97,7 +124,9 @@ exports.profilePostsScreen = (req, res) => {
       res.render('profile', {
         posts: posts,
         profileUsername: req.profileUser.username,
-        profileAvatar: req.profileUser.avatar
+        profileAvatar: req.profileUser.avatar,
+        isFollowing: req.isFollowing,
+        isVisitorsProfile: req.isVisitorsProfile
       })
     })
     .catch(function () {

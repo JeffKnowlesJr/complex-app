@@ -23,6 +23,7 @@ router.post('/search', postController.search)
 router.get(
   '/profile/:username',
   userController.ifUserExists,
+  userController.sharedProfileData,
   userController.profilePostsScreen
 )
 
@@ -31,6 +32,11 @@ router.post(
   '/addFollow/:username',
   userController.auth,
   followController.addFollow
+)
+router.post(
+  '/removeFollow/:username',
+  userController.auth,
+  followController.removeFollow
 )
 
 module.exports = router
