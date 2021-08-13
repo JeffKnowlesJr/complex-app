@@ -107,10 +107,12 @@ exports.register = (req, res) => {
     })
 }
 
-exports.home = (req, res) => {
+exports.home = async (req, res) => {
   if (req.session.user) {
     // console.log(req.session.user)
-    res.render('home-dashboard')
+    // fetch feed of posts for current user
+    let posts = await Post.getFeed(req.session.user.id)
+    res.render('home-dashboard', { posts: posts })
   } else {
     // using flash package to access and delete errors
     res.render('home-guest', {
