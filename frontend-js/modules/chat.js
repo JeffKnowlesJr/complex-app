@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify'
+
 export default class Chat {
   constructor() {
     this.openedYet = false
@@ -66,13 +68,13 @@ export default class Chat {
   displayMessageFromServer(data) {
     this.chatLog.insertAdjacentHTML(
       'beforeend',
-      `      <div class="chat-other">
-        <a href="#"><img class="avatar-tiny" src="${data.avatar}"></a>
+      DOMPurify.sanitize(`<div class="chat-other">
+        <a href="/profile/${data.username}"><img class="avatar-tiny" src="${data.avatar}"></a>
         <div class="chat-message"><div class="chat-message-inner">
           <a href="/profile/${data.username}"><strong>${data.username}:</strong></a>
           ${data.message}
         </div></div>
-      </div>`
+      </div>`)
     )
     this.chatLog.scrollTop = this.chatLog.scrollHeight
   }
@@ -83,7 +85,7 @@ export default class Chat {
     })
     this.chatLog.insertAdjacentHTML(
       'beforeend',
-      `
+      DOMPurify.sanitize(`
           <div class="chat-self">
         <div class="chat-message">
           <div class="chat-message-inner">
@@ -92,7 +94,7 @@ export default class Chat {
         </div>
         <img class="chat-avatar avatar-tiny" src="${this.avatar}">
       </div>
-    `
+    `)
     )
     this.chatLog.scrollTop = this.chatLog.scrollHeight
     this.chatField.value = ''
