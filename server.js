@@ -6,6 +6,8 @@ const markdown = require('marked')
 const sanitizeHTML = require('sanitize-html')
 const dotenv = require('dotenv')
 
+dotenv.config()
+
 app = express()
 
 let sessionOptions = session({
@@ -77,4 +79,14 @@ app.set('view engine', 'ejs')
 
 app.use('/', router)
 
-module.exports = app
+const server = require('http').createServer(app)
+
+const io = require('socket.io')(server)
+
+io.on('connection', function (socket) {
+  socket.on('chatMessageFromBrowser', (data) => {
+    io.emit('chatMessageFromServer', { message: data.message })
+  })
+})
+
+module.exports = server
