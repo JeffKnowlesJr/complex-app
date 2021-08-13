@@ -4,11 +4,12 @@ const MongoStore = require('connect-mongo')(session)
 const flash = require('connect-flash')
 const markdown = require('marked')
 const sanitizeHTML = require('sanitize-html')
+const dotenv = require('dotenv')
 
 app = express()
 
 let sessionOptions = session({
-  secret: '#Y3x5#7fSqKD7kkN0*HT0jo#1$bXD',
+  secret: process.env.SESSION_SECRET,
   store: new MongoStore({ client: require('./db') }),
   resave: false,
   saveUninitialized: false,
