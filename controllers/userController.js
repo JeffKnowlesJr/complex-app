@@ -126,7 +126,8 @@ exports.profilePostsScreen = (req, res) => {
         profileUsername: req.profileUser.username,
         profileAvatar: req.profileUser.avatar,
         isFollowing: req.isFollowing,
-        isVisitorsProfile: req.isVisitorsProfile
+        isVisitorsProfile: req.isVisitorsProfile,
+        tab: 'posts'
       })
     })
     .catch(function () {
@@ -143,11 +144,27 @@ exports.profileFollowersScreen = async (req, res) => {
       profileUsername: req.profileUser.username,
       profileAvatar: req.profileUser.avatar,
       isFollowing: req.isFollowing,
-      isVisitorsProfile: req.isVisitorsProfile
+      isVisitorsProfile: req.isVisitorsProfile,
+      tab: 'followers'
     })
   } catch (err) {
     res.render('404')
   }
 }
 
-exports.profileFollowingScreen = (req, res) => {}
+exports.profileFollowingScreen = async (req, res) => {
+  try {
+    let following = await Follow.getFollowingById(req.profileUser._id)
+
+    res.render('profile-following', {
+      following: following,
+      profileUsername: req.profileUser.username,
+      profileAvatar: req.profileUser.avatar,
+      isFollowing: req.isFollowing,
+      isVisitorsProfile: req.isVisitorsProfile,
+      tab: 'following'
+    })
+  } catch (err) {
+    res.render('404')
+  }
+}

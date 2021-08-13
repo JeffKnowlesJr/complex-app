@@ -27,17 +27,59 @@
 <div class="profile-nav nav nav-tabs pt-2 mb-4">
   <a
     href="/profile/<%= profileUsername %>"
-    class="profile-nav-link nav-item nav-link active"
+    class="
+      profile-nav-link
+      nav-item nav-link
+      <%
+      if
+      (tab
+      ==
+      'posts')
+      {
+      %>
+      active
+      <%
+      }
+      %>
+    "
     >Posts: 3</a
   >
   <a
     href="/profile/<%= profileUsername %>/followers"
-    class="profile-nav-link nav-item nav-link"
+    class="
+      profile-nav-link
+      nav-item nav-link
+      <%
+      if
+      (tab
+      ==
+      'followers')
+      {
+      %>
+      active
+      <%
+      }
+      %>
+    "
     >Followers: 3</a
   >
   <a
     href="/profile/<%= profileUsername %>/following"
-    class="profile-nav-link nav-item nav-link"
+    class="
+      profile-nav-link
+      nav-item nav-link
+      <%
+      if
+      (tab
+      ==
+      'following')
+      {
+      %>
+      active
+      <%
+      }
+      %>
+    "
     >Following: 2</a
   >
 </div>
