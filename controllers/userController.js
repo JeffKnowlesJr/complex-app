@@ -25,6 +25,19 @@ exports.sharedProfileData = async (req, res, next) => {
   req.isFollowing = isFollowing
   req.isVisitorsProfile = isVisitorsProfile
 
+  // Retreive post, follower, and post counts
+  let postCountPromise = Post.countPostsByAuthor(req.profileUser._id)
+  let followerCountPromise = Follow.countFollowersById(req.profileUser._id)
+  let followingCountPromise = Follow.countFollowingById(req.profileUser._id)
+  let [postCount, followerCount, followingCount] = await Promise.all([
+    postCountPromise,
+    followerCountPromise,
+    followingCountPromise
+  ])
+  req.postCount = postCount
+  req.followerCount = followerCount
+  req.followingCount = followingCount
+
   next()
 }
 
@@ -127,7 +140,12 @@ exports.profilePostsScreen = (req, res) => {
         profileAvatar: req.profileUser.avatar,
         isFollowing: req.isFollowing,
         isVisitorsProfile: req.isVisitorsProfile,
-        tab: 'posts'
+        tab: 'posts',
+        counts: {
+          postCount: req.postCount,
+          followerCount: req.followerCount,
+          followingCount: req.followingCount
+        }
       })
     })
     .catch(function () {
@@ -145,7 +163,12 @@ exports.profileFollowersScreen = async (req, res) => {
       profileAvatar: req.profileUser.avatar,
       isFollowing: req.isFollowing,
       isVisitorsProfile: req.isVisitorsProfile,
-      tab: 'followers'
+      tab: 'followers',
+      counts: {
+        postCount: req.postCount,
+        followerCount: req.followerCount,
+        followingCount: req.followingCount
+      }
     })
   } catch (err) {
     res.render('404')
@@ -162,7 +185,12 @@ exports.profileFollowingScreen = async (req, res) => {
       profileAvatar: req.profileUser.avatar,
       isFollowing: req.isFollowing,
       isVisitorsProfile: req.isVisitorsProfile,
-      tab: 'following'
+      tab: 'following',
+      counts: {
+        postCount: req.postCount,
+        followerCount: req.followerCount,
+        followingCount: req.followingCount
+      }
     })
   } catch (err) {
     res.render('404')

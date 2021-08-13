@@ -42,7 +42,7 @@
       }
       %>
     "
-    >Posts: 3</a
+    >Posts: <%= counts.postCount %></a
   >
   <a
     href="/profile/<%= profileUsername %>/followers"
@@ -61,7 +61,7 @@
       }
       %>
     "
-    >Followers: 3</a
+    >Followers: <%= counts.followerCount %></a
   >
   <a
     href="/profile/<%= profileUsername %>/following"
@@ -80,6 +80,6 @@
       }
       %>
     "
-    >Following: 2</a
+    >Following: <%= counts.followingCount %></a
   >
 </div>
