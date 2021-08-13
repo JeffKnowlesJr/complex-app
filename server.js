@@ -83,10 +83,25 @@ const server = require('http').createServer(app)
 
 const io = require('socket.io')(server)
 
+// This is just making our express session data available within the context of socketIO
+io.use(function (socket, next) {
+  sessionOptions(socket.request, socket.request.res, next)
+})
+
 io.on('connection', function (socket) {
-  socket.on('chatMessageFromBrowser', (data) => {
-    io.emit('chatMessageFromServer', { message: data.message })
-  })
+  if (socket.request.session.user) {
+    let user = socket.request.session.user
+
+    socket.emit('welcome', { username: user.username, avatar: user.avatar })
+
+    socket.on('chatMessageFromBrowser', (data) => {
+      socket.broadcast.emit('chatMessageFromServer', {
+        message: data.message,
+        username: user.username,
+        avatar: user.avatar
+      })
+    })
+  }
 })
 
 module.exports = server
