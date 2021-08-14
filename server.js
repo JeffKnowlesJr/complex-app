@@ -3,6 +3,7 @@ const session = require('express-session')
 const MongoStore = require('connect-mongo')(session)
 const flash = require('connect-flash')
 const markdown = require('marked')
+const csrf = require('csurf')
 const sanitizeHTML = require('sanitize-html')
 const dotenv = require('dotenv')
 
@@ -76,6 +77,12 @@ app.use(express.json())
 app.use(express.static('public'))
 app.set('views', 'views')
 app.set('view engine', 'ejs')
+
+app.use(csrf())
+
+app.use(function (req, res, next) {
+  res.locals.csrfToken = req.csrfToken()
+})
 
 app.use('/', router)
 
