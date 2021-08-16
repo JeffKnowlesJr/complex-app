@@ -15,7 +15,7 @@ exports.create = (req, res) => {
         .send({
           to: 'jeffknowlesjr@gmail.com',
           from: 'jeffknowlesjr@gmail.com',
-          subject: req.body.title,
+          subject: 'New Post on PostApp: ' + req.body.title,
           text: req.body.body,
           html: req.body.body
         })
