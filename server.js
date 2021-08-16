@@ -4,12 +4,14 @@ const MongoStore = require('connect-mongo')(session)
 const flash = require('connect-flash')
 const markdown = require('marked')
 const csrf = require('csurf')
+const app = express()
 const sanitizeHTML = require('sanitize-html')
-const dotenv = require('dotenv')
+const dotenv = require('dotenv').config()
 
-dotenv.config()
+app.use(express.urlencoded({ extended: false }))
+app.use(express.json())
 
-app = express()
+app.use('/api', require('./router-api'))
 
 let sessionOptions = session({
   secret: process.env.SESSION_SECRET,
@@ -70,9 +72,6 @@ const router = require('./router')
 
 // These two lines tell express to accept user data
 // from our form or included in the header as json
-
-app.use(express.urlencoded({ extended: false }))
-app.use(express.json())
 
 app.use(express.static('public'))
 app.set('views', 'views')

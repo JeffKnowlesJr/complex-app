@@ -77,6 +77,19 @@ exports.login = (req, res) => {
     })
 }
 
+exports.apiLogin = (req, res) => {
+  let user = new User(req.body)
+  // login returns a promise
+  user
+    .login()
+    .then((result) => {
+      res.json('Goodjob That is a real username and pass')
+    })
+    .catch((err) => {
+      res.json(err)
+    })
+}
+
 exports.logout = (req, res) => {
   req.session.destroy(() => {
     res.redirect('/')
