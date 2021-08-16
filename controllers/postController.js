@@ -24,6 +24,18 @@ exports.create = (req, res) => {
     })
 }
 
+exports.apiCreate = (req, res) => {
+  let post = new Post(req.body, req.apiUser._id)
+  post
+    .create()
+    .then(() => {
+      res.json('Congrats.')
+    })
+    .catch((err) => {
+      res.json(err)
+    })
+}
+
 exports.viewSingle = async (req, res) => {
   try {
     let post = await Post.findSingleById(req.params.id, req.visitorId)
@@ -92,6 +104,16 @@ exports.delete = (req, res) => {
       req.session.save(() => {
         res.redirect('/')
       })
+    })
+}
+
+exports.apiDelete = (req, res) => {
+  Post.delete(req.params.id, req.apiUser._id)
+    .then(() => {
+      res.json(`Congrats, you've successfully deleted post ${req.params.id}`)
+    })
+    .catch((err) => {
+      res.json(err)
     })
 }
 

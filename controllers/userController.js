@@ -1,6 +1,7 @@
 const User = require('../models/User')
 const Post = require('../models/Post')
 const Follow = require('../models/Follow')
+const jwt = require('jsonwebtoken')
 
 // This function is going to run on a profile route
 exports.sharedProfileData = async (req, res, next) => {
@@ -83,7 +84,11 @@ exports.apiLogin = (req, res) => {
   user
     .login()
     .then((result) => {
-      res.json('Goodjob That is a real username and pass')
+      res.json(
+        jwt.sign({ _id: user.data._id }, process.env.JWT_SECRET, {
+          expiresIn: '7d'
+        })
+      )
     })
     .catch((err) => {
       res.json(err)
@@ -227,4 +232,24 @@ exports.doesEmailExist = async function (req, res) {
   let emailBool = await User.doesEmailExist(req.body.email)
 
   res.json(emailBool)
+}
+
+exports.apiAuth = function (req, res, next) {
+  try {
+    req.apiUser = jwt.verify(req.header('x-auth-token'), process.env.JWT_SECRET)
+    next()
+  } catch (err) {
+    res.json('Sorry, you must provite a valid token')
+  }
+}
+
+exports.apiGetPostsByUsername = async function (req, res) {
+  try {
+    let authorDoc = await User.findByUserName(req.params.username)
+    console.log(authorDoc)
+    let posts = await Post.findByAuthorId(authorDoc._id)
+    res.json(posts)
+  } catch (err) {
+    res.json('Sorry, invalid user requested')
+  }
 }

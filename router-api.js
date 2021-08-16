@@ -1,10 +1,15 @@
+const apiRouter = require('express').Router()
 const userController = require('./controllers/userController')
 const postController = require('./controllers/postController')
 const followController = require('./controllers/followController')
 const consoleMiddleware = require('./middleware/console')
+const cors = require('cors')
 
-const apiRouter = require('express').Router()
+apiRouter.use(cors())
 
 apiRouter.post('/login', userController.apiLogin)
+apiRouter.post('/create-post', userController.apiAuth, postController.apiCreate)
+apiRouter.delete('/post/:id', userController.apiAuth, postController.apiDelete)
+apiRouter.get('/postsByAuthor/:username', userController.apiGetPostsByUsername)
 
 module.exports = apiRouter
