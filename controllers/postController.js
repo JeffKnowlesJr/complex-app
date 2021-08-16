@@ -14,9 +14,9 @@ exports.create = (req, res) => {
       sendgrid.send({
         to: 'jeffknowlesjr@gmail.com',
         from: 'jeffknowlesjr@gmail.com',
-        subject: 'Congrats on creating a new post!',
-        text: 'You have successfully created a post!',
-        html: 'You have successfully created a <bold>post!</bold>'
+        subject: req.body.title,
+        text: req.body.body,
+        html: req.body.body
       })
       req.flash('success', 'Post created')
       req.session.save(() => {
