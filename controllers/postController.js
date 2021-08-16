@@ -11,13 +11,20 @@ exports.create = (req, res) => {
   post
     .create()
     .then(() => {
-      sendgrid.send({
-        to: 'jeffknowlesjr@gmail.com',
-        from: 'jeffknowlesjr@gmail.com',
-        subject: req.body.title,
-        text: req.body.body,
-        html: req.body.body
-      })
+      sendgrid
+        .send({
+          to: 'jeffknowlesjr@gmail.com',
+          from: 'jeffknowlesjr@gmail.com',
+          subject: req.body.title,
+          text: req.body.body,
+          html: req.body.body
+        })
+        .then(() => {
+          console.log('Message sent')
+        })
+        .catch((err) => {
+          console.log(err.response.body)
+        })
       req.flash('success', 'Post created')
       req.session.save(() => {
         res.redirect(`/post/${post.data._id}`)
